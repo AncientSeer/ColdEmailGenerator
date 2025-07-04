@@ -1,8 +1,3 @@
-# 🔥 Streamlit + LangChain + Cohere Cold Email Generator (Python Version)
-# ✅ Web UI to upload resume and input job description
-
-# 📄 Save this file as `app.py`
-
 import streamlit as st
 import os
 from langchain_community.embeddings import CohereEmbeddings
@@ -14,16 +9,13 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-# API Key from .env
 cohere_api_key = os.getenv("COHERE_API_KEY")
 
-# Workaround for Cohere bug: pass user_agent manually
 cohere_config = {
     "cohere_api_key": cohere_api_key,
     "user_agent": "langchain"
 }
 
-# Initialize LLM and embeddings with explicit models
 llm = Cohere(model="command-r-plus", **cohere_config)
 embeddings = CohereEmbeddings(model="embed-english-v3.0", **cohere_config)
 
@@ -37,13 +29,11 @@ if st.button("Generate Cold Email"):
     if resume_file and job_description:
         resume_text = resume_file.read().decode("utf-8")
 
-        # Embed resume
         documents = [{"page_content": resume_text}]
         vectorstore = FAISS.from_texts([doc["page_content"] for doc in documents], embeddings)
         results = vectorstore.similarity_search(job_description, k=1)
         relevant_resume = results[0].page_content if results else resume_text
 
-        # Prompt template
         prompt = PromptTemplate.from_template('''
 You are an expert assistant writing professional cold emails for job applications.
 Based on this resume:
